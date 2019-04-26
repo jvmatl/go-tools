@@ -3538,7 +3538,7 @@ func checkJSONTag(pass *analysis.Pass, field *ast.Field, tag string) {
 			pass.Reportf(field.Tag.Pos(), "invalid JSON field name %q", fields[0])
 		}
 	}
-	var co, cs int
+	var co, cs, ci int
 	for _, s := range fields[1:] {
 		switch s {
 		case "omitempty":
@@ -3553,6 +3553,8 @@ func checkJSONTag(pass *analysis.Pass, field *ast.Field, tag string) {
 			if !ok || (basic.Info()&(types.IsBoolean|types.IsInteger|types.IsFloat|types.IsString)) == 0 {
 				pass.Reportf(field.Tag.Pos(), "the JSON string option only applies to fields of type string, floating point, integer or bool, or pointers to those")
 			}
+		case "inline":
+			ci++
 		default:
 			pass.Reportf(field.Tag.Pos(), "unknown JSON option %q", s)
 		}
@@ -3562,6 +3564,9 @@ func checkJSONTag(pass *analysis.Pass, field *ast.Field, tag string) {
 	}
 	if cs > 1 {
 		pass.Reportf(field.Tag.Pos(), `duplicate JSON option "string"`)
+	}
+	if ci > 1 {
+		pass.Reportf(field.Tag.Pos(), `duplicate JSON option "inline"`)
 	}
 }
 
