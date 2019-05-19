@@ -1,0 +1,21 @@
+language: go
+
+go:
+  - "master"
+  - "1.12"
+  - "1.11"
+
+go_import_path: "honnef.co/go/tools"
+
+cache:
+  directories:
+    - $HOME/.cache/staticcheck
+    - $HOME/.cache/go-build
+
+before_script:
+  - go get honnef.co/go/tools/cmd/staticcheck
+
+script:
+  - go test ./...
+  - go vet ./...
+  - staticcheck ./...
