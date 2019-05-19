@@ -10,6 +10,12 @@ go:
   - "1.12"
   - "1.11"
 
+# Travis's Windows builder doesn't understand "master"
+matrix:
+  exclude:
+    - os: windows
+      go: master
+
 go_import_path: "honnef.co/go/tools"
 
 cache:
