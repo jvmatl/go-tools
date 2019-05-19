@@ -1,5 +1,10 @@
 language: go
 
+os:
+  - linux
+  - osx
+  - windows
+
 go:
   - "master"
   - "1.12"
