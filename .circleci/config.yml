@@ -9,17 +9,25 @@ download: &download
     - run:
         name: "Download staticcheck"
         command: "go get honnef.co/go/tools/cmd/staticcheck"
+    - run:
+        name: "Download go-junit-report"
+        command: "go get github.com/jstemmer/go-junit-report"
     - persist_to_workspace:
         root: "/go/"
         paths:
           - "src/*"
           - "bin/staticcheck"
+          - "bin/go-junit-report"
 
 test: &test
   steps:
     - attach_workspace:
         at: "/go/"
-    - run: "go test ./..."
+    - run: "go test -v ./... | tee /tmp/test.out"
+    - run: "mkdir -p /tmp/test-results/go-test"
+    - run: "go-junit-report < /tmp/test.out > /tmp/test-results/go-test/results.xml"
+    - store_test_results:
+        path: "/tmp/test-results"
 
 vet: &vet
   steps:
