@@ -33,14 +33,14 @@ test: &test
         at: "/go/"
     - run:
         name: "Run tests"
-        command: "go test -race -v ./... >/tmp/out"
+        command: "go test -race -v ./... >/tmp/test.out"
     - run:
         name: "Process test results"
         when: always
         command: |
           mkdir -p /tmp/test-results/go-test
           go-junit-report < /tmp/test.out > /tmp/test-results/go-test/results.xml
-          cat /tmp/out
+          cat /tmp/test.out
     - store_test_results:
         path: "/tmp/test-results"
 
