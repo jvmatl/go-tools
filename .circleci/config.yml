@@ -1,0 +1,99 @@
+version: 2.1
+
+download: &download
+  steps:
+    - checkout
+    - run:
+        name: "Download dependencies"
+        command: "go get -d -t ./..."
+    - run:
+        name: "Download staticcheck"
+        command: "go get honnef.co/go/tools/cmd/staticcheck"
+    - persist_to_workspace:
+        root: "/go/"
+        paths:
+          - "src/*"
+          - "bin/staticcheck"
+
+test: &test
+  steps:
+    - attach_workspace:
+        at: "/go/"
+    - run: "go test ./..."
+
+vet: &vet
+  steps:
+    - attach_workspace:
+        at: "/go/"
+    - run: "go vet ./..."
+
+staticcheck: &staticcheck
+  steps:
+    - attach_workspace:
+        at: "/go/"
+    - run: "staticcheck -go 1.11 ./..."
+
+executors:
+  go11:
+    docker:
+      - image: "circleci/golang:1.11.9"
+    working_directory: "/go/src/honnef.co/go/tools"
+  go12:
+    docker:
+      - image: "circleci/golang:1.12.5"
+    working_directory: "/go/src/honnef.co/go/tools"
+
+jobs:
+  download12:
+    executor: go12
+    <<: *download
+  test12:
+    executor: go12
+    <<: *test
+  vet12:
+    executor: go12
+    <<: *vet
+  staticcheck12:
+    executor: go12
+    <<: *staticcheck
+
+  download11:
+    executor: go11
+    <<: *download
+  test11:
+    executor: go11
+    <<: *test
+  vet11:
+    executor: go11
+    <<: *vet
+  staticcheck11:
+    executor: go11
+    <<: *staticcheck
+
+
+workflows:
+  version: 2
+  ci12:
+    jobs:
+      - download12
+      - test12:
+          requires:
+            - download12
+      - vet12:
+          requires:
+            - download12
+      - staticcheck12:
+          requires:
+            - download12
+  ci11:
+    jobs:
+      - download11
+      - test11:
+          requires:
+            - download11
+      - vet11:
+          requires:
+            - download11
+      - staticcheck11:
+          requires:
+            - download11
