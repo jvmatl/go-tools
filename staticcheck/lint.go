@@ -859,24 +859,9 @@ func CheckWaitgroupAdd(pass *analysis.Pass) (interface{}, error) {
 		if len(fun.Body.List) == 0 {
 			return
 		}
-		stmt, ok := fun.Body.List[0].(*ast.ExprStmt)
-		if !ok {
-			return
-		}
-		call, ok := stmt.X.(*ast.CallExpr)
-		if !ok {
-			return
-		}
-		sel, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok {
-			return
-		}
-		fn, ok := pass.TypesInfo.ObjectOf(sel.Sel).(*types.Func)
-		if !ok {
-			return
-		}
-		if lint.FuncName(fn) == "(*sync.WaitGroup).Add" {
-			pass.Reportf(sel.Pos(), "should call %s before starting the goroutine to avoid a race",
+		stmt := fun.Body.List[0]
+		if IsCallToAST(pass, stmt, "(*sync.WaitGroup).Add") {
+			pass.Reportf(stmt.Pos(), "should call %s before starting the goroutine to avoid a race",
 				Render(pass, stmt))
 		}
 	}
