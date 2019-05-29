@@ -234,9 +234,6 @@ func CallNameAST(pass *analysis.Pass, call *ast.CallExpr) string {
 }
 
 func IsCallToAST(pass *analysis.Pass, node ast.Node, name string) bool {
-	if stmt, ok := node.(*ast.ExprStmt); ok {
-		node = stmt.X
-	}
 	call, ok := node.(*ast.CallExpr)
 	if !ok {
 		return false
