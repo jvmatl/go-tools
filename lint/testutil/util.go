@@ -19,6 +19,7 @@ type Analyzer struct {
 
 func Run(t *testing.T, analyzers []Analyzer) {
 	for _, a := range analyzers {
+		a := a
 		t.Run(a.Analyzer.Name, func(t *testing.T) {
 			t.Parallel()
 			for _, test := range a.Tests {
